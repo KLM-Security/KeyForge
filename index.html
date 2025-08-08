@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KeyForge - Password Generator</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>KeyForge</h1>
+    <input type="text" id="password" readonly />
+    <button onclick="generatePassword()">Generate Password</button>
+
+    <label for="length">Password Length: <span id="lengthValue">16</span></label>
+    <input type="range" id="length" min="8" max="64" value="16" oninput="updateLength(this.value)" />
+
+    <div class="options">
+      <label><input type="checkbox" id="uppercase" checked /> Include Uppercase Letters</label>
+      <label><input type="checkbox" id="lowercase" checked /> Include Lowercase Letters</label>
+      <label><input type="checkbox" id="numbers" checked /> Include Numbers</label>
+      <label><input type="checkbox" id="symbols" checked /> Include Symbols</label>
+      <label><input type="checkbox" id="exclude" checked /> Exclude Similar Characters</label>
+    </div>
+
+    <div class="strength">Password Strength: <span id="strengthText">-</span></div>
+    <div class="bar"><div class="bar-inner" id="strengthBar"></div></div>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>
