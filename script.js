@@ -71,30 +71,26 @@ function evaluateStrength(pwd) {
   }
 }
 
-async function sha1Hash(msg) {
-    const msgBuffer = new TextEncoder().encode(msg);
-    const hashBuffer = await crypto.subtle.digest("SHA-1", msgBuffer);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('').toUpperCase();
-}
-
 async function isPwned(password) {
-    const sha1 = await sha1Hash(password);
-    const prefix = sha1.slice(0, 5);
-    const suffix = sha1.slice(5);
+    const encoder = new TextEncoder();
+    const data = encoder.encode(password);
+    const hashBuffer = await crypto.subtle.digest('SHA-1', data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const fullHash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('').toUpperCase();
+
+    const prefix = fullHash.substring(0, 5);
+    const suffix = fullHash.substring(5);
 
     const response = await fetch(`https://api.pwnedpasswords.com/range/${prefix}`);
     const text = await response.text();
-
     const lines = text.split('\n');
-    return lines.some(line => line.split(':')[0] === suffix);
-}
-const password = generatePassword(); // fonction de KeyForge
-isPwned(password).then(compromised => {
-    if (compromised) {
-        alert("⚠️ Ce mot de passe a été compromis dans une fuite connue. Il est fortement déconseillé de l'utiliser.");
-        // Auto-régénérer ou changer la couleur du bouton par exemple
-    } else {
-        console.log("✅ Mot de passe unique et sûr !");
+
+    for (let line of lines) {
+        const [returnedSuffix, count] = line.trim().split(':');
+        if (returnedSuffix.toUpperCase() === suffix) {
+            return parseInt(count, 10); // Nombre de fois leaké
+        }
     }
-});
+
+    return 0; // Pas trouvé
+}
